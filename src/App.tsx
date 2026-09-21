@@ -76,6 +76,24 @@ const initialPlayers: Player[] = [
   { id: 3, name: 'Binu', avatar: initialAvatarQueue[2] },
 ]
 
+const STORAGE_KEY = 'futsal-teams-state'
+
+type SavedState = {
+  teams: Team[]
+  players: Player[]
+  avatarQueue: string[]
+  teamPlayerIds: Record<number, number[]>
+}
+
+const loadSavedState = (): SavedState | null => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) as SavedState : null
+  } catch {
+    return null
+  }
+}
+
 function TeamCard({
   team,
   assignedPlayers,
@@ -480,11 +498,12 @@ function FloatingNavbar({ view, onViewChange, onAdd }: { view: AppView; onViewCh
 }
 
 function App() {
+  const savedState = loadSavedState()
   const [view, setView] = useState<AppView>('teams')
-  const [teams, setTeams] = useState<Team[]>(initialTeams)
-  const [players, setPlayers] = useState<Player[]>(initialPlayers)
-  const [avatarQueue, setAvatarQueue] = useState<string[]>(() => initialAvatarQueue.slice(3))
-  const [teamPlayerIds, setTeamPlayerIds] = useState<Record<number, number[]>>({})
+  const [teams, setTeams] = useState<Team[]>(() => savedState?.teams ?? initialTeams)
+  const [players, setPlayers] = useState<Player[]>(() => savedState?.players ?? initialPlayers)
+  const [avatarQueue, setAvatarQueue] = useState<string[]>(() => savedState?.avatarQueue ?? initialAvatarQueue.slice(3))
+  const [teamPlayerIds, setTeamPlayerIds] = useState<Record<number, number[]>>(() => savedState?.teamPlayerIds ?? {})
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null)
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [editingTeamId, setEditingTeamId] = useState<number | null>(null)
@@ -493,6 +512,10 @@ function App() {
   const [draftPlayerName, setDraftPlayerName] = useState('')
   const [draggedId, setDraggedId] = useState<number | null>(null)
   const closeMenu = () => setOpenMenuId(null)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ teams, players, avatarQueue, teamPlayerIds }))
+  }, [teams, players, avatarQueue, teamPlayerIds])
 
   useEffect(() => {
     if (openMenuId === null) return
