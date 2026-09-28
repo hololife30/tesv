@@ -12,7 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import videoBg from './images/vid.mp4'
+import SkyGradient from './SkyGradient'
 import profile1 from './profile/1.jpg'
 import profile2 from './profile/2.jpg'
 import profile3 from './profile/3.jpg'
@@ -572,7 +572,7 @@ function App() {
     setDraggedId(null)
   }
 
-  return <main className="teams-screen"><video className="bg-video" autoPlay muted loop playsInline preload="auto" src={videoBg} onEnded={(event) => { event.currentTarget.currentTime = 0; event.currentTarget.play() }} /><div className="mobile-page">
+  return <main className="teams-screen"><SkyGradient className="bg-sky" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', aspectRatio: 'auto', zIndex: 0 }} /><div className="mobile-page">
     {(view !== 'teams' || selectedTeamId === null) && <header className="page-header" aria-label="Top header"><div className="page-title-wrap"><h2>{view === 'teams' ? 'Team' : view === 'users' ? 'Players' : view === 'calculator' ? 'Calculator' : 'Copy'}</h2><p>{view === 'teams' ? 'Create a team' : view === 'users' ? 'Add and manage your players' : view === 'calculator' ? 'Quick calculations' : 'Copy team players'}</p></div></header>}
     {view === 'teams' ? selectedTeamId === null ? <div className="team-grid compact-grid">{teams.map((team) => <TeamCard key={team.id} team={team} assignedPlayers={players.filter((player) => (teamPlayerIds[team.id] ?? []).includes(player.id))} isMenuOpen={openMenuId === team.id} isEditing={editingTeamId === team.id} draftName={draftName} onToggleMenu={(id) => setOpenMenuId((current) => current === id ? null : id)} onRename={handleRename} onDraftNameChange={setDraftName} onSaveRename={handleSaveRename} onCancelRename={() => setEditingTeamId(null)} onRemove={handleRemove} onDragStart={setDraggedId} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop} onCloseMenu={closeMenu} onOpenTeam={setSelectedTeamId} />)}</div> : <TeamDetailView team={teams.find((team) => team.id === selectedTeamId) ?? teams[0]} players={players.filter((player) => player.name.trim())} assignedPlayerIds={teamPlayerIds[selectedTeamId] ?? []} allAssignedPlayerIds={Object.values(teamPlayerIds).flat()} onBack={() => setSelectedTeamId(null)} onAddPlayer={handleAddPlayerToTeam} onRemovePlayer={handleRemovePlayerFromTeam} onClearAll={handleClearAllPlayersFromTeam} /> : view === 'users' ? <UsersView players={players} editingPlayerId={editingPlayerId} draftPlayerName={draftPlayerName} onStartEdit={handleStartPlayerEdit} onDraftNameChange={setDraftPlayerName} onSaveEdit={handleSavePlayerEdit} onCancelEdit={() => setEditingPlayerId(null)} onRemove={handleRemovePlayer} /> : view === 'calculator' ? <CalculatorView /> : <ShareView teams={teams} players={players} teamPlayerIds={teamPlayerIds} />}
     <FloatingNavbar view={view} onViewChange={(nextView) => { setView(nextView); setSelectedTeamId(null) }} onAdd={view === 'teams' ? handleAddCard : view === 'users' ? handleAddPlayer : () => undefined} />
